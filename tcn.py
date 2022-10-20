@@ -3,6 +3,8 @@ from torch import nn
 import torch.nn.functional as F
 
 class ResidualBlock(nn.Module):
+    '''Residual block to use in TCN'''
+
     def __init__(self, input_size, hidden_size, kernel_size, dilation):
         super(ResidualBlock, self).__init__()
         self.input_size = input_size
@@ -27,6 +29,7 @@ class ResidualBlock(nn.Module):
         self.dropout2 = nn.Dropout(p=0.2)
 
     def forward(self, x):
+        '''One step of computation'''
         output = self.pad1(x)
         output = F.relu(self.conv1(output))
         output = self.dropout1(output)
@@ -36,8 +39,12 @@ class ResidualBlock(nn.Module):
         return F.relu(x + output)
 
 class TCN(nn.Module):
+    '''Temporal Convolutional Network'''
+
     def __init__(self, input_size, kernel_sizes, dilations):
         super(TCN, self).__init__()
+        if len(kernel_sizes) != len(dilations):
+            raise ValueError('kernel_sizes and dilations must be of the same size')
         self.input_size = input_size
         self.kernel_sizes = kernel_sizes
         self.dilations = dilations
@@ -48,6 +55,7 @@ class TCN(nn.Module):
         self.fc = nn.Linear(self.input_size, self.input_size)
   
     def forward(self, value):
+        '''One step of computation'''
         output = torch.permute(value, (0, 2, 1))
         output = self.residuals(output)
         output = torch.permute(output, (0, 2, 1))
