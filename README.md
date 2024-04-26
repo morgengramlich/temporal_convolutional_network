@@ -1,1 +1,1 @@
-PyTorch implementation of Temporal Convolutional Network
+PyTorch implementation of a Temporal Convolutional Network
